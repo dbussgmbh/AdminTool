@@ -7,8 +7,8 @@ import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.html.Paragraph;
 import com.vaadin.flow.router.*;
 
-@Route(value = "p/:pluginId", layout = MainLayout.class)
-@RouteAlias(value = "p/:pluginId/*", layout = MainLayout.class)
+@Route(value = ":pluginId", layout = MainLayout.class)
+@RouteAlias(value = ":pluginId/*", layout = MainLayout.class)
 @PageTitle("Plugin")
 public class PluginHostView extends Div implements BeforeEnterObserver {
 
@@ -24,7 +24,7 @@ public class PluginHostView extends Div implements BeforeEnterObserver {
 
         String pluginId = event.getRouteParameters().get("pluginId").orElse("");
         String fullPath = event.getLocation().getPath();
-        String prefix = "p/" + pluginId;
+        String prefix = pluginId;
         String subPath = fullPath.length() > prefix.length() ? fullPath.substring(prefix.length()) : "";
         if (subPath.isEmpty()) subPath = "/";
         var queryParams = event.getLocation().getQueryParameters().getParameters();
