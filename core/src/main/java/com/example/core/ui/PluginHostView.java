@@ -9,7 +9,6 @@ import com.vaadin.flow.router.*;
 
 @Route(value = ":pluginId", layout = MainLayout.class)
 @RouteAlias(value = ":pluginId/*", layout = MainLayout.class)
-@PageTitle("Plugin")
 public class PluginHostView extends Div implements BeforeEnterObserver {
 
     private final PluginRegistry registry;
@@ -29,15 +28,18 @@ public class PluginHostView extends Div implements BeforeEnterObserver {
         if (subPath.isEmpty()) subPath = "/";
         var queryParams = event.getLocation().getQueryParameters().getParameters();
 
-        var opt = registry.find(pluginId);
-        if (opt.isEmpty()) {
+        var plugin = registry.find(pluginId);
+        if (plugin.isEmpty()) {
             add(new H2("Plugin nicht gefunden"));
             add(new Paragraph("Kein Plugin mit id: " + pluginId));
             add(new Paragraph("Tipp: Plugin-JAR nach ./plugins legen und im Plugin Manager auf 'Neu laden' klicken."));
             return;
         }
 
-        Component view = opt.get().plugin().createView(subPath, queryParams);
+        var title=plugin.get().plugin().pageTitle();
+        event.getUI().access(() -> event.getUI().getPage().setTitle(title));
+
+        Component view = plugin.get().plugin().createView(subPath, queryParams);
         add(view);
     }
 }

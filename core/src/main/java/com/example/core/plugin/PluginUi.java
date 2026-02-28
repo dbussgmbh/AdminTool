@@ -26,4 +26,8 @@ public interface PluginUi {
      * @param queryParams query params
      */
     Component createView(String subPath, Map<String, List<String>> queryParams);
+
+    default String pageTitle() {
+        return menuLabel();   // Fallback
+    }
 }
