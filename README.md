@@ -14,6 +14,9 @@ mvn clean package
 mvn -pl app spring-boot:run
 ```
 
+mvn -U clean package
+C:\Java\jdk22\bin\java.exe -jar app/target/app-1.0.0-SNAPSHOT.jar
+
 ## Plugins zur Laufzeit hinzufügen
 
 1) neues Plugin-JAR nach `app/plugins/` kopieren  
