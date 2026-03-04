@@ -102,35 +102,33 @@ public class MainLayout extends Composite<Div> implements RouterLayout {
         // Title
         H1 title = new H1("eKP Web-Admin");
         title.getStyle()
-                .set("margin", "0")
-                .set("font-size", "var(--lumo-font-size-m)")
-                .set("font-weight", "600")
-                .set("line-height", "1");
+                .set("font-size", "var(--lumo-font-size-xl)")
+                .set("font-weight", "600");
 
         // Toggle button styling
         toggleMenuBtn.addThemeVariants(ButtonVariant.LUMO_TERTIARY_INLINE);
         toggleMenuBtn.getStyle()
-                .set("border", "1px solid var(--lumo-contrast-10pct)")
-                .set("border-radius", "10px")
-                .set("width", "40px")
-                .set("height", "40px");
+                .set("width", "44px")
+                .set("height", "44px");
 
         HorizontalLayout left = new HorizontalLayout(toggleMenuBtn, title);
         left.setDefaultVerticalComponentAlignment(FlexComponent.Alignment.CENTER);
         left.setSpacing(true);
 
         // Notifications
-        Icon bell = VaadinIcon.BELL.create();
-        bell.getStyle().set("width", "20px").set("height", "20px");
+//        Icon bell = VaadinIcon.BELL.create();
+//        bell.getStyle()
+//                .set("width", "24px")
+//                .set("height", "24px");
 
-        Button notifications = new Button(bell);
-        notifications.addThemeVariants(ButtonVariant.LUMO_TERTIARY_INLINE);
-        notifications.getStyle()
-                .set("position", "relative")
-                .set("border", "1px solid var(--lumo-contrast-10pct)")
-                .set("border-radius", "10px")
-                .set("width", "40px")
-                .set("height", "40px");
+       // Button notifications = new Button(bell);
+//        notifications.addThemeVariants(ButtonVariant.LUMO_TERTIARY_INLINE);
+//        notifications.getStyle()
+//                .set("position", "relative")
+//                .set("border", "1px solid var(--lumo-contrast-10pct)")
+//                .set("border-radius", "10px")
+//                .set("width", "40px")
+//                .set("height", "40px");
 
         // Badge (optional)
         Span badge = new Span("3");
@@ -149,7 +147,7 @@ public class MainLayout extends Composite<Div> implements RouterLayout {
                 .set("justify-content", "center")
                 .set("padding", "0 5px")
                 .set("box-shadow", "0 1px 2px rgba(0,0,0,0.2)");
-        notifications.getElement().appendChild(badge.getElement());
+     //   notifications.getElement().appendChild(badge.getElement());
 
         // User menu
         Avatar avatar = new Avatar("Admin User");
@@ -167,16 +165,16 @@ public class MainLayout extends Composite<Div> implements RouterLayout {
 
         // Logo + Version
         Image logo = new Image("images/dataport.png", "Dataport");
-        logo.setHeight("30px");
-        logo.getStyle().set("opacity", "0.95");
+        logo.setHeight("60px");
+        //logo.getStyle().set("opacity", "0.95");
 
-        Span version = new Span("V1.02");
+        Span version = new Span("V1.01");
         version.getStyle()
-                .set("opacity", "0.7")
+                .set("opacity", "0.8")
                 .set("font-size", "var(--lumo-font-size-s)");
 
         HorizontalLayout right = new HorizontalLayout(
-                notifications,
+                //notifications,
                 userMenu,
                 logo,
                 version
@@ -186,20 +184,16 @@ public class MainLayout extends Composite<Div> implements RouterLayout {
 
         HorizontalLayout topbar = new HorizontalLayout(left, right);
         topbar.setWidthFull();
-        topbar.setHeight("80px");
+        topbar.getStyle().set("flex", "0 0 auto");
         topbar.setDefaultVerticalComponentAlignment(FlexComponent.Alignment.CENTER);
         topbar.setJustifyContentMode(FlexComponent.JustifyContentMode.BETWEEN);
 
         // Sticky classic admin header
         topbar.getStyle()
-                .set("position", "sticky")
-                .set("top", "0")
-                .set("z-index", "1100")
-                .set("padding", "0 var(--lumo-space-l)")
-                .set("background", "var(--lumo-primary-color)")
+                .set("padding", "0 var(--lumo-space-xl)")
+                .set("background", "var(--app-header-background)")
                 .set("color", "white")
-                .set("border-bottom", "1px solid rgba(0,0,0,0.1)")
-                .set("box-shadow", "0 1px 2px rgba(0,0,0,0.1)");
+                .set("box-shadow", "0 2px 4px rgba(0,0,0,0.1)");
 
         // Mark for JS offset calc
         topbar.getElement().setAttribute("data-app-header", "true");

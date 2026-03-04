@@ -6,7 +6,7 @@
     --lumo-primary-color-10pct: rgba(0,92,169,0.1);
 
     /* Header */
-    --app-header-background: #005ca9;
+    --app-header-background: silver;
     --app-header-text: white;
 
     /* App background */
@@ -54,3 +54,12 @@ body {
     background: var(--app-background);
 }
 
+/* Header-Höhe hart erzwingen */
+[data-app-header="true"] {
+    height: 96px !important;
+    min-height: 96px !important;
+    max-height: 96px !important;
+
+    /* damit er im Flex-Layout nicht wieder zusammenschrumpft */
+    flex: 0 0 auto !important;
+}
