@@ -1,5 +1,16 @@
-/**/target/
-/.idea/
-/*.iml
-/.vscode/
+# Maven
+**/target/
+
+# IDE
+.idea/
+*.iml
+.vscode/
+
+# Plugins
 /app/plugins/*.jar
+
+# Vaadin generated
+**/frontend/generated/
+
+# Node
+node_modules/
