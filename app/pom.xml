@@ -35,42 +35,7 @@
         <artifactId>spring-boot-maven-plugin</artifactId>
       </plugin>
 
-      <!-- Copy sample plugins into app/plugins on package -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-dependency-plugin</artifactId>
-        <version>3.6.1</version>
-        <executions>
-          <execution>
-            <id>copy-sample-plugins</id>
-            <phase>package</phase>
-            <goals>
-              <goal>copy</goal>
-            </goals>
-            <configuration>
-              <artifactItems>
-                <artifactItem>
-                  <groupId>com.example</groupId>
-                  <artifactId>plugin-one</artifactId>
-                  <version>${project.version}</version>
-                  <type>jar</type>
-                  <outputDirectory>${project.basedir}/plugins</outputDirectory>
-                  <destFileName>plugin-one.jar</destFileName>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>com.example</groupId>
-                  <artifactId>plugin-two</artifactId>
-                  <version>${project.version}</version>
-                  <type>jar</type>
-                  <outputDirectory>${project.basedir}/plugins</outputDirectory>
-                  <destFileName>plugin-two.jar</destFileName>
-                </artifactItem>
-              </artifactItems>
-              <overWriteSnapshots>true</overWriteSnapshots>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
+
     </plugins>
   </build>
 
