@@ -1,0 +1,56 @@
+:root {
+
+    /* Primary brand color */
+    --lumo-primary-color: #005ca9;
+    --lumo-primary-color-50pct: rgba(0,92,169,0.5);
+    --lumo-primary-color-10pct: rgba(0,92,169,0.1);
+
+    /* Header */
+    --app-header-background: #005ca9;
+    --app-header-text: white;
+
+    /* App background */
+    --app-background: #f4f6f9;
+
+    /* Side menu */
+    --app-nav-background: white;
+    --app-nav-hover: rgba(0,92,169,0.08);
+    --app-nav-active: rgba(0,92,169,0.14);
+
+}
+
+[data-app-header="true"] {
+    background: var(--app-header-background);
+    color: var(--app-header-text);
+    border-bottom: none;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+}
+
+
+
+vaadin-side-nav {
+    background: var(--app-nav-background);
+}
+
+vaadin-side-nav-item {
+    border-radius: 10px;
+    margin: 3px 6px;
+}
+
+vaadin-side-nav-item::part(content) {
+    padding: 10px 12px;
+}
+
+vaadin-side-nav-item:hover::part(content) {
+    background: var(--app-nav-hover);
+}
+
+vaadin-side-nav-item[active]::part(content) {
+    background: var(--app-nav-active);
+    font-weight: 600;
+}
+
+body {
+    background: var(--app-background);
+}
+

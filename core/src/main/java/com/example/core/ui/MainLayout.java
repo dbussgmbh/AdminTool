@@ -2,9 +2,14 @@ package com.example.core.ui;
 
 import com.example.core.plugin.LoadedPlugin;
 import com.example.core.plugin.PluginRegistry;
+import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.Composite;
+import com.vaadin.flow.component.HasElement;
 import com.vaadin.flow.component.UI;
+import com.vaadin.flow.component.avatar.Avatar;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.contextmenu.SubMenu;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H1;
@@ -12,20 +17,18 @@ import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.menubar.MenuBar;
+import com.vaadin.flow.component.menubar.MenuBarVariant;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.sidenav.SideNav;
 import com.vaadin.flow.component.sidenav.SideNavItem;
 import com.vaadin.flow.component.splitlayout.SplitLayout;
 import com.vaadin.flow.router.RouterLayout;
-import com.vaadin.flow.server.StreamResource;
+import com.vaadin.flow.theme.Theme;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
 
-/**
- * Full-width header + resizable/collapsible SideMenu with persisted width.
- */
+
 public class MainLayout extends Composite<Div> implements RouterLayout {
 
     private static final String POS_KEY = "nav.split.pos";          // e.g. "18%"
@@ -34,146 +37,230 @@ public class MainLayout extends Composite<Div> implements RouterLayout {
 
     private final Div content = new Div();
 
+    private SideNav nav;
+    private SplitLayout split;
+
     public MainLayout(PluginRegistry registry) {
-        getContent().setSizeFull();
-        getContent().getStyle().set("display", "flex").set("flex-direction", "column");
+        Div root = getContent();
+        root.setSizeFull();
+        root.getStyle().set("display", "flex").set("flex-direction", "column");
 
-        SideNav nav = buildNav(registry);
+        nav = buildNav(registry);
 
+        // Content area background like admin dashboards
         content.setSizeFull();
-        content.getStyle().set("padding", "var(--lumo-space-m)");
+        content.getStyle()
+                .set("padding", "var(--lumo-space-l)")
+                .set("background", "var(--lumo-contrast-5pct)");
 
-        SplitLayout split = new SplitLayout();
+        split = new SplitLayout();
         split.setSizeFull();
         split.addToPrimary(nav);
         split.addToSecondary(content);
         split.setSplitterPosition(18);
         split.getStyle().set("flex", "1");
 
-        var toggleMenuBtn = buildToggleButton(nav, split);
-        var header = buildHeader(toggleMenuBtn);
+        // Make menu width feel "admin"
+        split.setPrimaryStyle("minWidth", "260px");
+        split.setPrimaryStyle("maxWidth", "420px");
 
-        getContent().add(header, split);
+        Button toggleMenuBtn = buildToggleButton(nav, split);
+        Component header = buildHeader(toggleMenuBtn);
+
+        root.add(header, split);
 
         initPersistence(nav, split);
         initResponsiveOverlay(nav, split);
     }
 
+    // ---------------------------
+    // NAV
+    // ---------------------------
     private SideNav buildNav(PluginRegistry registry) {
         SideNav nav = new SideNav();
-        nav.setWidthFull();
+        nav.setWidth("100%");
         nav.getStyle()
                 .set("overflow", "auto")
-                .set("min-width", "220px")
-                .set("border-right", "1px solid var(--lumo-contrast-10pct)")
-                .set("padding", "var(--lumo-space-s)");
+                .set("padding", "var(--lumo-space-xs)")
+                .set("background", "var(--lumo-base-color)")
+                .set("border-right", "1px solid var(--lumo-contrast-10pct)");
 
         nav.addItem(new SideNavItem("Home", HomeView.class));
         nav.addItem(new SideNavItem("Plugin Manager", PluginManagerView.class));
 
         for (LoadedPlugin lp : registry.all()) {
             var p = lp.plugin();
-            nav.addItem(new SideNavItem(p.menuLabel(), p.id())); // without "p/"
+            nav.addItem(new SideNavItem(p.menuLabel(), p.id())); // plugin routes handled by your host
         }
         return nav;
     }
 
-    private SplitLayout buildSplit(SideNav nav) {
-        SplitLayout split = new SplitLayout();
-        split.setPrimaryStyle("minWidth", "220px");
-        split.setPrimaryStyle("maxWidth", "50%");
+    // ---------------------------
+    // HEADER (classic admin)
+    // ---------------------------
+    private Component buildHeader(Button toggleMenuBtn) {
+        // Title
+        H1 title = new H1("eKP Web-Admin");
+        title.getStyle()
+                .set("margin", "0")
+                .set("font-size", "var(--lumo-font-size-m)")
+                .set("font-weight", "600")
+                .set("line-height", "1");
 
-        // Put nav on the left, content placeholder on the right
-        split.addToPrimary(nav);
-        split.addToSecondary(new Div()); // replaced later with 'content'
+        // Toggle button styling
+        toggleMenuBtn.addThemeVariants(ButtonVariant.LUMO_TERTIARY_INLINE);
+        toggleMenuBtn.getStyle()
+                .set("border", "1px solid var(--lumo-contrast-10pct)")
+                .set("border-radius", "10px")
+                .set("width", "40px")
+                .set("height", "40px");
 
-        // default position if no localStorage
-        split.setSplitterPosition(18); // percent
+        HorizontalLayout left = new HorizontalLayout(toggleMenuBtn, title);
+        left.setDefaultVerticalComponentAlignment(FlexComponent.Alignment.CENTER);
+        left.setSpacing(true);
 
-        return split;
+        // Notifications
+        Icon bell = VaadinIcon.BELL.create();
+        bell.getStyle().set("width", "20px").set("height", "20px");
+
+        Button notifications = new Button(bell);
+        notifications.addThemeVariants(ButtonVariant.LUMO_TERTIARY_INLINE);
+        notifications.getStyle()
+                .set("position", "relative")
+                .set("border", "1px solid var(--lumo-contrast-10pct)")
+                .set("border-radius", "10px")
+                .set("width", "40px")
+                .set("height", "40px");
+
+        // Badge (optional)
+        Span badge = new Span("3");
+        badge.getStyle()
+                .set("position", "absolute")
+                .set("top", "-6px")
+                .set("right", "-6px")
+                .set("background", "var(--lumo-error-color)")
+                .set("color", "white")
+                .set("border-radius", "999px")
+                .set("font-size", "12px")
+                .set("min-width", "18px")
+                .set("height", "18px")
+                .set("display", "flex")
+                .set("align-items", "center")
+                .set("justify-content", "center")
+                .set("padding", "0 5px")
+                .set("box-shadow", "0 1px 2px rgba(0,0,0,0.2)");
+        notifications.getElement().appendChild(badge.getElement());
+
+        // User menu
+        Avatar avatar = new Avatar("Admin User");
+        avatar.setHeight("32px");
+        avatar.setWidth("32px");
+
+        MenuBar userMenu = new MenuBar();
+        userMenu.addThemeVariants(MenuBarVariant.LUMO_TERTIARY_INLINE);
+        var userItem = userMenu.addItem(avatar);
+
+        SubMenu sub = userItem.getSubMenu();
+        sub.addItem("Profile", e -> UI.getCurrent().navigate("profile"));
+        sub.addItem("Settings", e -> UI.getCurrent().navigate("settings"));
+        sub.addItem("Logout", e -> doLogout());
+
+        // Logo + Version
+        Image logo = new Image("images/dataport.png", "Dataport");
+        logo.setHeight("30px");
+        logo.getStyle().set("opacity", "0.95");
+
+        Span version = new Span("V1.02");
+        version.getStyle()
+                .set("opacity", "0.7")
+                .set("font-size", "var(--lumo-font-size-s)");
+
+        HorizontalLayout right = new HorizontalLayout(
+                notifications,
+                userMenu,
+                logo,
+                version
+        );
+        right.setDefaultVerticalComponentAlignment(FlexComponent.Alignment.CENTER);
+        right.setSpacing(true);
+
+        HorizontalLayout topbar = new HorizontalLayout(left, right);
+        topbar.setWidthFull();
+        topbar.setHeight("80px");
+        topbar.setDefaultVerticalComponentAlignment(FlexComponent.Alignment.CENTER);
+        topbar.setJustifyContentMode(FlexComponent.JustifyContentMode.BETWEEN);
+
+        // Sticky classic admin header
+        topbar.getStyle()
+                .set("position", "sticky")
+                .set("top", "0")
+                .set("z-index", "1100")
+                .set("padding", "0 var(--lumo-space-l)")
+                .set("background", "var(--lumo-primary-color)")
+                .set("color", "white")
+                .set("border-bottom", "1px solid rgba(0,0,0,0.1)")
+                .set("box-shadow", "0 1px 2px rgba(0,0,0,0.1)");
+
+        // Mark for JS offset calc
+        topbar.getElement().setAttribute("data-app-header", "true");
+
+        return topbar;
     }
 
+    private void doLogout() {
+        // If Spring Security uses POST /logout, configure it accordingly or implement POST submit.
+        UI.getCurrent().getPage().setLocation("logout");
+    }
+
+    // ---------------------------
+    // Toggle: Desktop collapse / Mobile drawer
+    // ---------------------------
     private Button buildToggleButton(SideNav nav, SplitLayout split) {
         Icon icon = VaadinIcon.MENU.create();
         icon.getStyle().set("width", "20px").set("height", "20px");
 
         Button toggle = new Button(icon);
-        toggle.addClassName("menu-toggle");
         toggle.getElement().setAttribute("aria-label", "Menü ein-/ausblenden");
         toggle.getElement().setAttribute("title", "Menü ein-/ausblenden");
 
         toggle.addClickListener(e -> {
-            // Collapse/Expand with persisted last width
             split.getElement().executeJs("""
               const split = this;
               const nav = $0;
-              const posKey = $1, posLastKey = $2, collapsedKey = $3;
+              const root = $1;
+              const posKey = $2, posLastKey = $3, collapsedKey = $4;
+
+              const mobile = window.matchMedia('(max-width: 900px)').matches;
+
+              if (mobile && root.__openNavDrawer) {
+                if (root.__isNavDrawerOpen && root.__isNavDrawerOpen()) root.__closeNavDrawer();
+                else root.__openNavDrawer();
+                return;
+              }
 
               const isCollapsed = localStorage.getItem(collapsedKey) === "true";
 
               if (!isCollapsed) {
-                // collapse: remember current, hide nav, set 0%
                 localStorage.setItem(posLastKey, split.splitterPosition || "18%");
                 localStorage.setItem(collapsedKey, "true");
                 nav.style.display = "none";
                 split.splitterPosition = "0%";
               } else {
-                // expand: restore last saved
                 const last = localStorage.getItem(posLastKey) || localStorage.getItem(posKey) || "18%";
                 localStorage.setItem(collapsedKey, "false");
                 nav.style.display = "";
                 split.splitterPosition = last;
               }
-            """, nav.getElement(), POS_KEY, POS_LAST_KEY, COLLAPSED_KEY);
+            """, nav.getElement(), getContent().getElement(), POS_KEY, POS_LAST_KEY, COLLAPSED_KEY);
         });
 
         return toggle;
     }
 
-    private HorizontalLayout buildHeader(Button toggleMenuBtn) {
-        H1 logo = new H1("eKP Web-Admin");
-        logo.getStyle().set("margin", "0").set("font-size", "var(--lumo-font-size-l)");
-
-        Image image = new Image("images/dataport.png", "Dataport Image");
-        image.setHeight("28px");
-
-
-        Span version = new Span("V1.02");
-        version.getStyle().set("opacity", "0.7");
-
-        Button logout = new Button("Log out", VaadinIcon.SIGN_OUT.create());
-        logout.addClassName("header-btn");
-
-        // Spacer
-        Div spacer = new Div();
-        spacer.getStyle().set("flex", "1");
-
-        HorizontalLayout header = new HorizontalLayout(
-                toggleMenuBtn,
-                image,
-                logo,
-                spacer,
-                logout,
-                version
-        );
-        header.setWidthFull();
-        header.setDefaultVerticalComponentAlignment(FlexComponent.Alignment.CENTER);
-        header.getStyle()
-                .set("gap", "var(--lumo-space-m)")
-                .set("padding", "var(--lumo-space-s) var(--lumo-space-m)")
-                .set("border-bottom", "1px solid var(--lumo-contrast-10pct)")
-                .set("background", "var(--lumo-base-color)");
-
-        // Make the toggle look nicer
-        toggleMenuBtn.getStyle()
-                .set("border", "1px solid var(--lumo-contrast-10pct)")
-                .set("border-radius", "10px");
-
-        return header;
-    }
-
+    // ---------------------------
+    // Persist split + collapsed
+    // ---------------------------
     private void initPersistence(SideNav nav, SplitLayout split) {
-        // Restore position and save on drag end
         split.getElement().executeJs("""
           const split = this;
           const posKey = $0, posLastKey = $1;
@@ -187,7 +274,6 @@ public class MainLayout extends Composite<Div> implements RouterLayout {
           });
         """, POS_KEY, POS_LAST_KEY);
 
-        // Restore collapsed state
         getContent().getElement().executeJs("""
           const nav = $0;
           const split = $1;
@@ -199,26 +285,20 @@ public class MainLayout extends Composite<Div> implements RouterLayout {
         """, nav.getElement(), split.getElement(), COLLAPSED_KEY);
     }
 
-    /**
-     * Optional nicer mobile behavior:
-     * - On small screens, collapse side menu into an overlay drawer under header.
-     * - Keeps desktop behavior (resizable split).
-     */
+    // ---------------------------
+    // Mobile overlay drawer
+    // ---------------------------
     private void initResponsiveOverlay(SideNav nav, SplitLayout split) {
-        // Create overlay container for nav (client-side) and move nav in/out based on breakpoint.
-        // Breakpoint: 900px
         getContent().getElement().executeJs("""
           const root = $0;
           const nav = $1;
           const split = $2;
 
-          // Create overlay drawer once
           let drawer = root.querySelector('[data-nav-drawer]');
           if (!drawer) {
             drawer = document.createElement('div');
             drawer.setAttribute('data-nav-drawer', 'true');
             drawer.style.position = 'fixed';
-            drawer.style.top = '56px'; // header height approx
             drawer.style.left = '0';
             drawer.style.bottom = '0';
             drawer.style.width = '280px';
@@ -228,13 +308,12 @@ public class MainLayout extends Composite<Div> implements RouterLayout {
             drawer.style.boxShadow = 'var(--lumo-box-shadow-m)';
             drawer.style.transform = 'translateX(-110%)';
             drawer.style.transition = 'transform 160ms ease';
-            drawer.style.zIndex = '1000';
+            drawer.style.zIndex = '1200';
             drawer.style.overflow = 'auto';
 
             const backdrop = document.createElement('div');
             backdrop.setAttribute('data-nav-backdrop', 'true');
             backdrop.style.position = 'fixed';
-            backdrop.style.top = '56px';
             backdrop.style.left = '0';
             backdrop.style.right = '0';
             backdrop.style.bottom = '0';
@@ -242,7 +321,7 @@ public class MainLayout extends Composite<Div> implements RouterLayout {
             backdrop.style.opacity = '0';
             backdrop.style.pointerEvents = 'none';
             backdrop.style.transition = 'opacity 160ms ease';
-            backdrop.style.zIndex = '999';
+            backdrop.style.zIndex = '1190';
 
             backdrop.addEventListener('click', () => {
               drawer.style.transform = 'translateX(-110%)';
@@ -256,43 +335,49 @@ public class MainLayout extends Composite<Div> implements RouterLayout {
 
           const backdrop = root.querySelector('[data-nav-backdrop]');
 
+          function headerHeight() {
+            const header = document.querySelector('[data-app-header="true"]');
+            return header ? header.getBoundingClientRect().height : 80;
+          }
+
+          function applyTopOffset() {
+            const top = headerHeight();
+            drawer.style.top = top + 'px';
+            backdrop.style.top = top + 'px';
+          }
+
           function openDrawer() {
+            applyTopOffset();
             drawer.style.transform = 'translateX(0)';
             backdrop.style.opacity = '1';
             backdrop.style.pointerEvents = 'auto';
           }
+
           function closeDrawer() {
             drawer.style.transform = 'translateX(-110%)';
             backdrop.style.opacity = '0';
             backdrop.style.pointerEvents = 'none';
           }
 
-          // Expose functions for the toggle button to use on mobile
           root.__openNavDrawer = openDrawer;
           root.__closeNavDrawer = closeDrawer;
           root.__isNavDrawerOpen = () => drawer.style.transform === 'translateX(0)';
 
-          // Move nav into drawer for mobile, back to split for desktop
           function applyMode() {
+            applyTopOffset();
             const mobile = window.matchMedia('(max-width: 900px)').matches;
 
             if (mobile) {
-              // Ensure nav is visible in drawer
               if (nav.parentElement !== drawer) {
-                // Hide split primary area and move nav
                 nav.style.display = '';
                 drawer.appendChild(nav);
-                split.style.display = 'block';
-                // On mobile: disable resizing effect by collapsing split position
                 split.splitterPosition = '0%';
               }
             } else {
-              // Desktop: ensure nav in split primary
               if (nav.parentElement === drawer) {
                 closeDrawer();
-                // Put nav back
                 split.firstElementChild.appendChild(nav);
-                // Restore collapsed state / width
+
                 const collapsed = localStorage.getItem($3) === "true";
                 if (collapsed) {
                   nav.style.display = 'none';
@@ -308,16 +393,27 @@ public class MainLayout extends Composite<Div> implements RouterLayout {
 
           window.addEventListener('resize', applyMode);
           applyMode();
-        """, getContent().getElement(), nav.getElement(), split.getElement(), COLLAPSED_KEY, POS_LAST_KEY, POS_KEY);
-
-        // Make the toggle button open/close drawer on mobile instead of collapsing split
-        // (We can't access the button element here easily; you can keep this optional part
-        // by calling JS from the toggle click listener, see below.)
+        """, getContent().getElement(), nav.getElement(), split.getElement(),
+                COLLAPSED_KEY, POS_LAST_KEY, POS_KEY);
     }
 
+    // ---------------------------
+    // RouterLayout content: wrap in "card"
+    // ---------------------------
     @Override
-    public void showRouterLayoutContent(com.vaadin.flow.component.HasElement contentElement) {
+    public void showRouterLayoutContent(HasElement contentElement) {
         content.removeAll();
-        content.getElement().appendChild(contentElement.getElement());
+
+        Div card = new Div();
+        card.getStyle()
+                .set("background", "var(--lumo-base-color)")
+                .set("border", "1px solid var(--lumo-contrast-10pct)")
+                .set("border-radius", "12px")
+                .set("box-shadow", "0 1px 2px rgba(0,0,0,0.04)")
+                .set("padding", "var(--lumo-space-l)")
+                .set("min-height", "calc(100vh - 110px)"); // ~ header + margins
+
+        card.getElement().appendChild(contentElement.getElement());
+        content.add(card);
     }
 }

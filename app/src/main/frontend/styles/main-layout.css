@@ -1,0 +1,12 @@
+vaadin-side-nav-item {
+    border-radius: 10px;
+    margin: 2px 4px;
+}
+
+vaadin-side-nav-item::part(content) {
+    padding: 10px 12px;
+}
+
+vaadin-side-nav-item[active]::part(content) {
+    background: var(--lumo-primary-color-10pct);
+}
