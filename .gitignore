@@ -6,11 +6,17 @@
 *.iml
 .vscode/
 
-# Plugins
-/app/plugins/*.jar
-
-# Vaadin generated
-**/frontend/generated/
-
 # Node
 node_modules/
+
+# Vaadin generated frontend
+**/frontend/generated/
+
+# Vaadin build bundles
+**/src/main/bundles/
+
+# Generated Vite config
+vite.generated.ts
+
+# Plugin jars
+/app/plugins/*.jar
