@@ -20,24 +20,22 @@
       <version>${project.version}</version>
     </dependency>
 
+    <!-- Vaadin Spring Boot app (Tomcat, etc.) -->
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>com.vaadin</groupId>
-      <artifactId>vaadin-dev</artifactId>
     </dependency>
   </dependencies>
 
   <build>
     <plugins>
+      <!-- Creates executable jar -->
       <plugin>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-maven-plugin</artifactId>
       </plugin>
 
+      <!-- Copy sample plugins into app/plugins on package -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-dependency-plugin</artifactId>
@@ -46,7 +44,9 @@
           <execution>
             <id>copy-sample-plugins</id>
             <phase>package</phase>
-            <goals><goal>copy</goal></goals>
+            <goals>
+              <goal>copy</goal>
+            </goals>
             <configuration>
               <artifactItems>
                 <artifactItem>
@@ -73,4 +73,67 @@
       </plugin>
     </plugins>
   </build>
+
+  <profiles>
+    <!-- DEV profile (active by default): enables Vaadin dev server -->
+    <profile>
+      <id>dev</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+
+      <dependencies>
+        <dependency>
+          <groupId>com.vaadin</groupId>
+          <artifactId>vaadin-dev</artifactId>
+        </dependency>
+      </dependencies>
+
+      <build>
+        <plugins>
+          <!-- Optional, but helpful when switching start methods -->
+          <plugin>
+            <groupId>com.vaadin</groupId>
+            <artifactId>vaadin-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>vaadin-prepare-frontend</id>
+                <phase>generate-resources</phase>
+                <goals>
+                  <goal>prepare-frontend</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+    <!-- PRODUCTION profile: builds frontend bundle and runs without dev server -->
+    <profile>
+      <id>production</id>
+      <properties>
+        <vaadin.productionMode>true</vaadin.productionMode>
+      </properties>
+
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>com.vaadin</groupId>
+            <artifactId>vaadin-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>vaadin-build-frontend</id>
+                <phase>prepare-package</phase>
+                <goals>
+                  <goal>build-frontend</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+
 </project>
