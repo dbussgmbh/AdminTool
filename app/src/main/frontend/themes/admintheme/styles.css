@@ -6,7 +6,7 @@
     --lumo-primary-color-10pct: rgba(0,92,169,0.1);
 
     /* Header */
-    --app-header-background: silver;
+    --app-header-background: light-grey;
     --app-header-text: white;
 
     /* App background */
@@ -38,7 +38,7 @@ vaadin-side-nav-item {
 }
 
 vaadin-side-nav-item::part(content) {
-    padding: 10px 12px;
+    padding: 5px 2px;
 }
 
 vaadin-side-nav-item:hover::part(content) {

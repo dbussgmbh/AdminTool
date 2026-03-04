@@ -49,19 +49,19 @@ public class MainLayout extends Composite<Div> implements RouterLayout {
 
         // Content area background like admin dashboards
         content.setSizeFull();
-        content.getStyle()
-                .set("padding", "var(--lumo-space-l)")
-                .set("background", "var(--lumo-contrast-5pct)");
+        content.getStyle().set("background", "var(--lumo-contrast-5pct)");
+
+        content.getStyle().set("padding", "15px 20px 20px 8px");
 
         split = new SplitLayout();
         split.setSizeFull();
         split.addToPrimary(nav);
         split.addToSecondary(content);
-        split.setSplitterPosition(18);
+        split.setSplitterPosition(8);
         split.getStyle().set("flex", "1");
 
         // Make menu width feel "admin"
-        split.setPrimaryStyle("minWidth", "260px");
+        split.setPrimaryStyle("minWidth", "160px");
         split.setPrimaryStyle("maxWidth", "420px");
 
         Button toggleMenuBtn = buildToggleButton(nav, split);
@@ -402,10 +402,10 @@ public class MainLayout extends Composite<Div> implements RouterLayout {
         card.getStyle()
                 .set("background", "var(--lumo-base-color)")
                 .set("border", "1px solid var(--lumo-contrast-10pct)")
-                .set("border-radius", "12px")
+                .set("border-radius", "10px")
                 .set("box-shadow", "0 1px 2px rgba(0,0,0,0.04)")
                 .set("padding", "var(--lumo-space-l)")
-                .set("min-height", "calc(100vh - 110px)"); // ~ header + margins
+                .set("min-height", "calc(100vh - 10px)"); // ~ header + margins
 
         card.getElement().appendChild(contentElement.getElement());
         content.add(card);
