@@ -26,7 +26,7 @@ import com.vaadin.flow.component.sidenav.SideNavItem;
 import com.vaadin.flow.component.splitlayout.SplitLayout;
 import com.vaadin.flow.router.RouterLayout;
 import com.vaadin.flow.theme.Theme;
-
+import com.vaadin.flow.theme.lumo.Lumo;
 
 
 public class MainLayout extends Composite<Div> implements RouterLayout {
@@ -173,14 +173,34 @@ public class MainLayout extends Composite<Div> implements RouterLayout {
                 .set("opacity", "0.8")
                 .set("font-size", "var(--lumo-font-size-s)");
 
+        Button themeToggle = new Button();
+        themeToggle.setIcon(VaadinIcon.MOON.create());
+
+        themeToggle.addClickListener(e -> {
+            UI ui = UI.getCurrent();
+
+            if (ui.getElement().getThemeList().contains(Lumo.DARK)) {
+                ui.getElement().getThemeList().remove(Lumo.DARK);
+                themeToggle.setIcon(VaadinIcon.MOON.create());
+            } else {
+                ui.getElement().getThemeList().add(Lumo.DARK);
+                themeToggle.setIcon(VaadinIcon.SUN_O.create());
+            }
+        });
+
         HorizontalLayout right = new HorizontalLayout(
                 //notifications,
                 userMenu,
+                themeToggle,
                 logo,
                 version
         );
         right.setDefaultVerticalComponentAlignment(FlexComponent.Alignment.CENTER);
         right.setSpacing(true);
+
+
+
+
 
         HorizontalLayout topbar = new HorizontalLayout(left, right);
         topbar.setWidthFull();
