@@ -164,7 +164,7 @@ public class MainLayout extends Composite<Div> implements RouterLayout {
         sub.addItem("Logout", e -> doLogout());
 
         // Logo + Version
-        Image logo = new Image("images/dataport.png", "Dataport");
+        Image logo = new Image("images/dataport.png", "Dataport Image");
         logo.setHeight("60px");
         //logo.getStyle().set("opacity", "0.95");
 
